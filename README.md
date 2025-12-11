@@ -1,1 +1,1 @@
-# Hazardous_Astroid_Classifier
+# Hazardous_Asteroid_Classifier
