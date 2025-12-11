@@ -254,13 +254,4 @@ Isolation Forest
 
 Autoencoders
 
-▶️ 11. How to Run This Project
-git clone https://github.com/<your-username>/Hazardous_Asteroid_Classifier.git
-cd Hazardous_Asteroid_Classifier
-pip install -r requirements.txt
-jupyter notebook
 
-
-Open the notebook:
-
-Asteroid_Detector_ML.ipynb
