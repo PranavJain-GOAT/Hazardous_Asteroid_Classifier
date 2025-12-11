@@ -1,139 +1,266 @@
-# Hazardous_Asteroid_Classifier
-🌌 Hazardous Asteroid Classifier 🚀
+🚀 Hazardous Asteroid Classifier — ML Project
 
-A Machine Learning Pipeline for Predicting Potentially Hazardous Asteroids & Detecting Anomalies
+A complete Machine Learning pipeline for identifying potentially hazardous asteroids using NASA orbital and approach data.
 
-⭐ Overview
+📌 Project Overview
 
-This project builds a complete end-to-end ML pipeline to classify asteroids as Hazardous or Non-Hazardous using NASA NEO dataset features.
-It also performs anomaly detection using two different approaches — Isolation Forest and a custom Autoencoder.
-SHAP Explainability is used to understand which features influence the model the most.
+This project builds a robust machine learning classifier to categorize asteroids as Hazardous (1) or Not Hazardous (0) based on their physical and orbital characteristics.
+It includes:
 
-🛰️ Key Features
-🔭 1. Data Cleaning & Feature Engineering
+Complete EDA
 
-Conversion of approach year/month/day into a unified approach_date
+Feature engineering based on orbital mechanics
 
-Time-based features such as time_until_approach
+Handling class imbalance
 
-Orbital mechanics features:
+Multiple ML models with XGBoost as the final choice
 
-eccentricity
+K-Fold Cross Validation (K = 2 to 10)
 
-orbital period
+Hyperparameter optimization
 
-specific angular momentum
+ROC & Confusion Matrix evaluation
 
-velocity at perihelion & aphelion
+SHAP explainability
 
-Custom engineered features:
+Anomaly detection using Isolation Forest + Autoencoder
 
-danger_score
+This README follows the exact workflow used inside the notebook.
 
-approach_severity
+🧭 1. Exploratory Data Analysis (EDA)
+1.1 Data Inspection
 
-energy_ratio
+Loaded dataset and checked shape, dtypes, missing values
 
-🧭 2. Anomaly Detection
+Displayed head/tail samples
 
-Two independent methods were used:
+Identified numerical & categorical features
 
-📌 Isolation Forest (unsupervised)
+1.2 Statistical Distribution
 
-Identifies anomalous asteroid behavior based on distance, velocity, and orbital metrics.
-Outputs: Anomaly_IF
+Histograms for all continuous features
 
-📌 Autoencoder (custom deep learning model)
+Checked skewness
 
-Reconstructs asteroid feature vectors and flags high-loss samples as anomalies.
-Outputs: anomaly_using_autoencoder
+Decided which features require scaling
 
-A confusion matrix compares agreement between both anomaly detectors.
+1.3 Outlier Detection
 
-🌋 3. Classification Model — XGBoost
+Boxplots for each numerical feature
 
-The primary model predicts whether an asteroid is Hazardous (1) or Safe (0).
+Z-score based outlier detection
 
-Included:
+Identified extreme values in:
 
-Train-test split
-
-SMOTE oversampling
-
-K-Fold Cross Validation (K = 2–10)
-
-LogLoss & Accuracy plots for each K
-
-Hyperparameter optimisation
-
-🧠 4. Explainability — SHAP Values
-
-SHAP plots highlight which engineered & physical features most strongly affect hazard classification.
-
-📊 5. Visualizations
-
-The notebook generates:
-
-Pairplots for feature relationships
-
-Correlation heatmap
-
-ROC Curve
-
-Confusion Matrix
-
-SHAP summary bar plot
-
-Anomaly distribution plots
-
-🚀 Project Structure
-Hazardous_Asteroid_Classifier/
-│── data/                         # Dataset (not included in repo)
-│── models/                       # Saved XGBoost + Autoencoder models
-│── visuals/                      # All plots generated
-│── Astroid_Detector_ML.ipynb     # Main notebook
-│── requirements.txt              # Dependencies
-│── README.md                     # Documentation
-
-🧪 Tech Stack
-
-Python 3.10
-
-Pandas, NumPy, Seaborn, Matplotlib
-
-TensorFlow / Keras
-
-scikit-learn
-
-SMOTE (imblearn)
-
-XGBoost
-
-SHAP
-
-📈 Results Summary
-
-XGBoost achieves strong accuracy on predicting hazardous asteroids
-
-SHAP confirms importance of:
-
-Risk Score
+Velocity
 
 Miss Distance
 
-Orbital Period
+Semi-Major Axis
 
-Velocity features
+1.4 Correlation Analysis
 
-Isolation Forest and Autoencoder highlight potential unusual asteroid behaviors
+Heatmap showing feature correlations
 
-🛠️ How to Run
-1️⃣ Clone the repo
-git clone https://github.com/PranavJain-GOAT/Hazardous_Asteroid_Classifier.git
+Highlighted:
+
+Semi-Major Axis ↔ Orbital Period (Kepler’s Law)
+
+High correlation between distance measures
+
+🛠️ 2. Feature Engineering
+2.1 Date Features
+
+📌 Combined approach_year, approach_month, approach_day into approach_date
+📌 Extracted day_of_year
+
+2.2 Physics-Inspired Generated Features
+
+Added scientifically meaningful features:
+
+Miss-to-Axis Ratio
+
+Time Until Approach
+
+Orbital Eccentricity
+
+Average Orbital Velocity
+
+Specific Orbital Energy
+
+Escape Velocity
+
+Specific Angular Momentum
+
+Velocity at Perihelion & Aphelion
+
+Synodic Period & Mean Motion
+
+2.3 Additional Custom Features
+
+These improve model separability:
+
+📌 danger_score → ratio of velocity to miss distance
+📌 approach_severity → inverse of time remaining
+📌 energy_ratio → orbital energy / semi-major axis
+
+⚖️ 3. Handling Class Imbalance
+
+The dataset is highly imbalanced (Hazardous ≪ Not Hazardous).
+Techniques applied:
+
+SMOTE oversampling
+
+Class weights during model training
+
+Ensured balanced splits using stratify=y
+
+🏗️ 4. Model Building
+
+Multiple models were tested:
+
+Model	Result
+Logistic Regression	Baseline
+Random Forest	Good but unstable
+XGBoost ⭐	Best results
+LightGBM	Optional alternative
+
+XGBoost was selected as the final model due to:
+
+Best ROC-AUC
+
+Handles imbalance
+
+Works well with engineered features
+
+Interpretable via SHAP
+
+🔄 5. K-Fold Cross Validation (K = 2–10)
+
+Implemented training loops for K = 2 to 10.
+For each K:
+
+Performed SMOTE inside each fold
+
+Collected logloss and accuracy curves
+
+Plotted:
+
+Validation Loss vs Epochs
+
+Validation Accuracy vs Epochs
+
+Outcome:
+
+✔ Model stable across folds
+✔ Lower K overfits slightly
+✔ Higher K generalizes better
+
+🎯 6. Hyperparameter Optimization
+
+Used RandomizedSearchCV / manual grid tuning:
+
+max_depth
+
+learning_rate
+
+subsample
+
+colsample_bytree
+
+n_estimators
+
+Best model saved and evaluated.
+
+📈 7. Model Evaluation
+
+Metrics computed:
+
+Accuracy
+
+Precision
+
+Recall (important for Hazardous class)
+
+F1-Score
+
+Confusion Matrix
+
+ROC Curve (AUC)
+
+🔍 8. Anomaly Detection
+
+Two anomaly detection frameworks:
+
+8.1 Isolation Forest (in-built method)
+
+Trained on numerical features
+
+Labeled anomalies as Anomaly_IF
+
+8.2 Autoencoder (custom deep learning method)
+
+Built a symmetric encoder–decoder NN
+
+Trained to reconstruct normal samples
+
+Used reconstruction error to detect anomalies
+
+Added Anomaly_AE column
+
+8.3 Comparison
+
+Confusion Matrix between methods
+
+Count of anomalies detected by both
+
+Intersection of anomaly sets
+
+🧠 9. Explainability — SHAP
+
+Used SHAP GradientExplainer / Explainer (since TreeExplainer had compatibility issues with XGBoost).
+
+Visualizations include:
+
+SHAP bar plot (feature importance)
+
+SHAP summary plot (feature impact)
+
+Key Insights:
+
+Miss Distance features were the strongest predictors
+
+Velocity and orbital energy also played major roles
+
+📦 10. Technologies Used
+
+Python
+
+Pandas, NumPy
+
+Matplotlib, Seaborn
+
+XGBoost
+
+Scikit-Learn
+
+TensorFlow/Keras
+
+SHAP
+
+Imbalanced-Learn
+
+Isolation Forest
+
+Autoencoders
+
+▶️ 11. How to Run This Project
+git clone https://github.com/<your-username>/Hazardous_Asteroid_Classifier.git
 cd Hazardous_Asteroid_Classifier
-
-2️⃣ Install dependencies
 pip install -r requirements.txt
+jupyter notebook
 
-3️⃣ Run the notebook
-jupyter notebook Astroid_Detector_ML.ipynb
+
+Open the notebook:
+
+Asteroid_Detector_ML.ipynb
